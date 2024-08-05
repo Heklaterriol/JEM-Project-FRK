@@ -90,6 +90,24 @@ class JemModelEventslist extends ListModel
 		$filtertype  = $app->getUserStateFromRequest('com_jem.eventslist.'.$itemid.'.filter_type', 'filter_type', 0, 'int');
 		$this->setState('filter.filter_type', $filtertype);
 
+		$filtermonth  = $app->getUserStateFromRequest('com_jem.eventslist.'.$itemid.'.filter_month', 'filter_month', 0, 'string');
+		$this->setState('filter.filter_month', $filtermonth);
+
+		# Search - Filter by setting menu
+		$today = new DateTime();
+		$filterDaysBefore = $params->get('tablefiltereventfrom','');
+		if ($filterDaysBefore){
+			$dateFrom = (clone $today)->modify('-' . $filterDaysBefore . ' days')->format('Y-m-d');
+			$where = ' DATEDIFF(IF (a.enddates IS NOT NULL, a.enddates, a.dates), "'. $dateFrom .'") >= 0';
+			$this->setState('filter.calendar_from',$where);
+		}
+		$filterDaysAfter  = $params->get('tablefiltereventuntil','');
+		if ($filterDaysAfter){
+			$dateTo = (clone $today)->modify( $filterDaysAfter . ' days')->format('Y-m-d');
+			$where = ' DATEDIFF(a.dates, "'. $dateTo . '") <= 0';
+			$this->setState('filter.calendar_to',$where);
+		}
+
 		# publish state
 		$this->_populatePublishState($task);
 
@@ -320,7 +338,7 @@ class JemModelEventslist extends ListModel
 		$query->select(
 				$this->getState('list.select',
 				'a.access,a.alias,a.attribs,a.checked_out,a.checked_out_time,a.contactid,a.created,a.created_by,a.created_by_alias,a.custom1,a.custom2,a.custom3,a.custom4,a.custom5,a.custom6,a.custom7,a.custom8,a.custom9,a.custom10,a.dates,a.datimage,a.enddates,a.endtimes,a.featured,' .
-				'a.fulltext,a.hits,a.id,a.introtext,a.language,a.locid,a.maxplaces,a.reservedplaces,a.minbookeduser,a.maxbookeduser,a.metadata,a.meta_keywords,a.meta_description,a.modified,a.modified_by,a.published,a.registra,a.times,a.title,a.unregistra,a.waitinglist,a.requestanswer,DAYOFMONTH(a.dates) AS created_day, YEAR(a.dates) AS created_year, MONTH(a.dates) AS created_month,' .
+				'a.fulltext,a.hits,a.id,a.introtext,a.language,a.locid,a.maxplaces,a.reservedplaces,a.minbookeduser,a.maxbookeduser,a.metadata,a.meta_keywords,a.meta_description,a.modified,a.modified_by,a.published,a.registra,a.times,a.title,a.unregistra,a.waitinglist,a.requestanswer,a.seriesbooking,a.singlebooking, DAYOFMONTH(a.dates) AS created_day, YEAR(a.dates) AS created_year, MONTH(a.dates) AS created_month,' .
 				'a.recurrence_byday,a.recurrence_counter,a.recurrence_first_id,a.recurrence_limit,a.recurrence_limit_date,a.recurrence_number, a.recurrence_type,a.version'
 			)
 		);
@@ -426,8 +444,23 @@ class JemModelEventslist extends ListModel
 		#############################
 		## FILTER - CALENDAR_DATES ##
 		#############################
-		$cal_from = $this->getState('filter.calendar_from');
-		$cal_to   = $this->getState('filter.calendar_to');
+		$cal_from    = $this->getState('filter.calendar_from');
+		$cal_to      = $this->getState('filter.calendar_to');
+		$cal_month   = $this->getState('filter.filter_month');
+		if ($cal_month) {
+			$cal_month = DateTime::createFromFormat('Y-m', $cal_month);
+			$filter_date_from = $cal_month->format('Y-m-01');
+			$filter_date_to = $cal_month->modify('last day of this month')->format('Y-m-d');
+
+			$where = ' DATEDIFF(IF (a.enddates IS NOT NULL, a.enddates, a.dates), "'. $filter_date_from .'") >= 0';
+			$this->setState('filter.calendar_from',$where);
+
+			$where = ' DATEDIFF(a.dates, "'. $filter_date_to . '") <= 0';
+			$this->setState('filter.calendar_to',$where);
+
+			$cal_from = $this->getState('filter.calendar_from');
+			$cal_to   = $this->getState('filter.calendar_to');
+		}
 
 		if ($cal_from) {
 			$query->where($cal_from);
@@ -852,7 +885,8 @@ class JemModelEventslist extends ListModel
 			$show_unpublished = $user->can(array('edit', 'publish'), 'event', false, false, 1);
 			if ($show_unpublished) {
 				// global editor or publisher permission
-				$this->setState('filter.published', array(0, 1));
+				$publishedStates = $this->show_archived_events ? array(0, 1, 2) : array(0, 1);
+				$this->setState('filter.published', $publishedStates);
 			} else {
 				// no global permission but maybe on event level
 				$this->setState('filter.published', 1);

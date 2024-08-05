@@ -68,6 +68,7 @@ class JemViewEventslist extends JemView
 		//Text filter
 		$filter_type = $app->getUserStateFromRequest('com_jem.eventslist.' . $itemid . '.filter_type', 'filter_type', 0, 'int');
 		$search = $app->getUserStateFromRequest('com_jem.eventslist.' . $itemid . '.filter_search', 'filter_search', '', 'string');
+		$search_month = $app->getUserStateFromRequest('com_jem.eventslist.' . $itemid . '.filter_month', 'filter_month', '', 'string');
 
 
 		//Filter only featured:
@@ -191,8 +192,9 @@ class JemViewEventslist extends JemView
 		if ($jemsettings->showstate == 1) {
 			$filters[] = HTMLHelper::_('select.option', '5', Text::_('COM_JEM_STATE'));
 		}
-		$lists['filter'] = HTMLHelper::_('select.genericlist', $filters, 'filter_type', array('size'=>'1','class'=>'inputbox'), 'value', 'text', $filter_type);
+		$lists['filter'] = HTMLHelper::_('select.genericlist', $filters, 'filter_type', array('size'=>'1','class'=>'form-select'), 'value', 'text', $filter_type);
 		$lists['search'] = $search;
+		$lists['month'] = $search_month;
 
 		// Create the pagination object
 		$pagination = $this->get('Pagination');

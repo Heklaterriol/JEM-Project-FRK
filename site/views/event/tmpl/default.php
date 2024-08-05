@@ -64,7 +64,12 @@ if ($jemsettings->oldevent > 0) {
         <span style="white-space: nowrap;">
             <?php
             echo Text::_('COM_JEM_EVENT') . JemOutput::recurrenceicon($this->item) .' ';
-            echo JemOutput::editbutton($this->item, $params, $attribs, $this->permissions->canEditEvent, 'editevent') .' ';
+	        if($this->item_root) {
+	            echo JemOutput::editbutton($this->item_root, $params, $attribs, $this->permissions->canEditEvent, 'editevent') . ' ';
+	        }
+            if(!$this->item_root || ($this->item_root && $this->item->recurrence_first_id)) {
+                echo JemOutput::editbutton($this->item, $params, $attribs, $this->permissions->canEditEvent, 'editevent') . ' ';
+            }
             echo JemOutput::copybutton($this->item, $params, $attribs, $this->permissions->canAddEvent, 'editevent');
             ?>
         </span>
@@ -254,7 +259,7 @@ if ($jemsettings->oldevent > 0) {
 	<p></p>
 	<hr />
 
-	<div itemprop="location" itemscope="itemscope" itemtype="https://schema.org/Place">
+	<div class="venue_id<?php echo $this->item->locid; ?>" itemprop="location" itemscope="itemscope" itemtype="https://schema.org/Place">
     <meta itemprop="name" content="<?php echo $this->escape($this->item->venue); ?>" />
 		<?php $itemid = $this->item ? $this->item->id : 0 ; ?>
 		<h2 class="location">

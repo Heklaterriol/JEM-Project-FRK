@@ -33,11 +33,25 @@ if ($jemsettings->oldevent > 0) {
 	$expDate = date("D, d M Y H:i:s", strtotime('+1 day', $enddate));
 	$document->addCustomTag('<meta http-equiv="expires" content="' . $expDate . '"/>');
 }
-?>
-<?php if ($params->get('access-view')) { /* This will show nothings otherwise - ??? */ ?>
-<div id="jem" class="event_id<?php echo $this->item->did; ?> jem_event<?php echo $this->pageclass_sfx;?>"
-	itemscope="itemscope" itemtype="https://schema.org/Event">
-  
+
+$catclasses = '';
+foreach ((array)$this->categories as $category) {
+    $catclasses .= ' cat_id' . $this->escape($category->id);
+}
+
+if ($params->get('access-view')) { /* This will show nothings otherwise - ??? */ ?>
+
+<div id="jem" class="event_id<?php 
+    echo $this->escape($this->item->did); 
+    if (!empty($this->item->locid)) { 
+        echo ' venue_id' . $this->escape($this->item->locid);
+    } 
+    if (!empty($catclasses)) { 
+        echo $this->escape($catclasses); 
+    }
+?> jem_event<?php echo $this->escape($this->pageclass_sfx); ?>" 
+    itemscope="itemscope" itemtype="https://schema.org/Event">    
+    
   <meta itemprop="url" content="<?php echo rtrim($uri->base(), '/').Route::_(JemHelperRoute::getEventRoute($this->item->slug)); ?>" />
   <meta itemprop="identifier" content="<?php echo rtrim($uri->base(), '/').Route::_(JemHelperRoute::getEventRoute($this->item->slug)); ?>" />
   
@@ -56,14 +70,18 @@ if ($jemsettings->oldevent > 0) {
 
 	<!-- Event -->
 	<h2 class="jem">
-		<?php		
-		echo Text::_('COM_JEM_EVENT') . JemOutput::recurrenceicon($this->item) .' ';
-        echo JemOutput::editbutton($this->item, $params, $attribs, $this->permissions->canEditEvent, 'editevent') .' ';
+		<?php
+        echo Text::_('COM_JEM_EVENT') . JemOutput::recurrenceicon($this->item) . ' ';
+        if($this->item_root) {
+            echo JemOutput::editbutton($this->item_root, $params, $attribs, $this->permissions->canEditEvent, 'editevent') . ' ';
+        }
+        if(!$this->item_root || ($this->item_root && $this->item->recurrence_first_id)) {
+        	echo JemOutput::editbutton($this->item, $params, $attribs, $this->permissions->canEditEvent, 'editevent') .' ';
+        }
         echo JemOutput::copybutton($this->item, $params, $attribs, $this->permissions->canAddEvent, 'editevent');
 		?>
 	</h2>
   <div class="jem-row">
-  
     <div class="jem-info">
       <dl class="jem-dl">
         <?php if ($params->get('event_show_detailstitle',1)) : ?>
@@ -198,7 +216,7 @@ if ($jemsettings->oldevent > 0) {
 			// Optional link to let them register to see the whole event.
 			if ($params->get('event_show_readmore') && $this->item->fulltext != null) {
 				$link1 = Route::_('index.php?option=com_users&view=login');
-				$link = new JUri($link1);
+				$link = new Uri($link1);
 				echo '<p class="readmore">';
 					echo '<a href="'.$link.'">';
 					if ($params->get('event_alternative_readmore') == false) {
@@ -261,7 +279,7 @@ if ($jemsettings->oldevent > 0) {
 	<p></p>
 	<hr class="jem-hr">
 
-	<div itemprop="location" itemscope="itemscope" itemtype="https://schema.org/Place">
+	<div class="venue_id<?php echo $this->item->locid; ?>" itemprop="location" itemscope="itemscope" itemtype="https://schema.org/Place">
     <meta itemprop="name" content="<?php echo $this->escape($this->item->venue); ?>" />
 		<?php $itemid = $this->item ? $this->item->id : 0 ; ?>
 		<h2 class="jem-location">

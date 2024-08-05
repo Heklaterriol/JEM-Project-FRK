@@ -66,6 +66,10 @@ body.com_jem.body-overlayed {
     justify-content: flex-start;
 }
 
+#jem .jem-justify-center {
+    justify-content: space-around;
+}
+
 #jem .jem-justify-end {
     justify-content: flex-end;
 }
@@ -109,6 +113,12 @@ body.com_jem.body-overlayed {
 #jem .jem-dl dt label span,
 #jem .jem-dl-long dt label span {
     font-weight: normal;
+}
+
+#jem .row-month {
+    font-weight: bold;
+    padding: 5px;
+    font-size: 1.332rem;
 }
 
 /*Special for the description lable in editevent and editvenue*/
@@ -167,6 +177,10 @@ body.com_jem.body-overlayed {
     clear: both;
 }
 
+#jem .clr {
+    clear: both;
+}
+
 #jem .jem-date .input-append {
     display: flex;
     flex-direction: row;
@@ -180,12 +194,6 @@ body.com_jem.body-overlayed {
     flex-wrap: nowrap;
     justify-content: flex-end;
     gap: 5px;
-}
-
-#jem #limit {
-    padding: 0 10px;
-    margin: 0;
-    width: 80px;
 }
 
 #jem .jem_limit {
@@ -210,15 +218,24 @@ body.com_jem.body-overlayed {
 }
 
 #jem_filter div {
-    margin-bottom: 5px;
+    margin-bottom: 2px;
 }
 
 #jem_filter label,
 #jem_filter select,
 #jem_filter input,
-#jem_filter button,
 #status-lbl {
     margin-right: 5px;
+}
+
+.jem_search .jem-row {
+    display: flex !important;
+}
+
+#jem_filter button {
+    margin-right: 5px;
+    --btn-padding-x: 0.8rem;
+    --btn-padding-y: 0.4rem;
 }
 
 #jem .jem-misc {
@@ -276,6 +293,15 @@ body.com_jem.body-overlayed {
     width: auto;
 }
 
+#jem #starthours,
+#jem #startminutes,
+#jem #endhours,
+#jem #endminutes,
+#jem #jform_locid_name {
+    padding: .6rem 1rem;
+    border-color: #ced4da;
+}
+
 #jem form input::-webkit-outer-spin-button,
 #jem form input::-webkit-inner-spin-button {
     opacity: 1;
@@ -283,6 +309,7 @@ body.com_jem.body-overlayed {
 
 #jem .choose-status  {padding-right: 30px;}
 #jem .choose-status select#status {display: inline;}
+#jem .choose-places  {padding-right: 30px;}
 
 #jem .jem-sort-parts div::after {
     content: "";
@@ -632,3 +659,23 @@ body.com_jem.body-overlayed {
 .jem-registered-user-owner {
     font-weight: bold;
 }
+
+#table-series {
+    border-collapse: collapse;
+    width: auto;
+    max-width: 100%;
+}
+#table-series th {
+    padding: 12px;
+    text-align: center;
+    background-color: #04AA6D;
+    color: white;
+    border: 1px solid #ddd;
+}
+#table-series td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+#table-series tr:nth-child(even){background-color: #f2f2f2;}
+#table-series tr:nth-child(odd){background-color: #ffffff;}
